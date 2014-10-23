@@ -71,9 +71,9 @@ def new_rev_search(partnum, econum):
     pass  # TODO fill in this function
 
 
-with open('ECO_attachments.txt', 'r') as attachments, open('sample_REVT.txt', 'r') as revtable:
-    for line in attachments:
-        if rev_in_filename_regex(line) is not None:
-            print("%s   ---   %s" % (rev_in_filename_regex(line), line))
-        # new_rev_search(line)
-        # pass  # TODO Fill in this function
+# with open('ECO_attachments.txt', 'r') as attachments, open('sample_REVT.txt', 'r') as revtable:
+#     for line in attachments:
+#         if rev_in_filename_regex(line) is not None:
+#             print("%s   ---   %s" % (rev_in_filename_regex(line), line))
+#         # new_rev_search(line)
+#         # pass  # TODO Fill in this function
