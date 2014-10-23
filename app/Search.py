@@ -1,7 +1,5 @@
-__author__ = 'foxma'
-import mmap
-import os, string, re
 
+import re
 
 # Load both text files into memory
 
@@ -26,7 +24,7 @@ import os, string, re
 # line by line of the ECO Table, check if there is a file with the <PARTNUMBER>-REV<###> format for each item number on
 # the ECO. If there is not, write that missing file to a log item_attachment_missing.txt with (item number, rev, ECO)
 
-def rev_in_filename_regex(searchtext):
+def find_rev(searchtext):  # This searches a string for the revision character
     rev_no_space = re.compile("(Rev|rev|REV)([A-z0-9]{1,3})")
     rev_w_space = re.compile("(Rev |rev |REV )([A-z0-9]{1,3})")
     rev_w_dash = re.compile("(Rev-|rev-|REV-)([A-z0-9]{1,3})")
@@ -61,8 +59,7 @@ def rev_in_filename_regex(searchtext):
         pass  # TODO make sure pass is appropriate here
 
 
-
-def get_newrev_from_eco_table(line):
+def get_new_rev(searchtext):  # This searches the index for the
     delimiter = '\t'
     pass  # TODO fill in this function
 
@@ -71,9 +68,9 @@ def new_rev_search(partnum, econum):
     pass  # TODO fill in this function
 
 
-# with open('ECO_attachments.txt', 'r') as attachments, open('sample_REVT.txt', 'r') as revtable:
-#     for line in attachments:
-#         if rev_in_filename_regex(line) is not None:
-#             print("%s   ---   %s" % (rev_in_filename_regex(line), line))
-#         # new_rev_search(line)
-#         # pass  # TODO Fill in this function
+def generate_sample_index(attachments, revs):
+    with open(attachments, 'r') as attachment_index, open(revs, 'r') as revtable:
+        for line in attachment_index:
+            if find_rev(line) is not None:
+                print("%s   ---   %s" % (find_rev(line), line))
+            # pass  # TODO Fill in this function
