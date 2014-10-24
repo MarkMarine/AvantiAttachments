@@ -3,9 +3,10 @@ from os.path import normpath
 from app import Search
 
 
-errorlog = normpath("c:/users/foxma/pycharmprojects/avantiattachments/results/manual_fix_required.txt")
+errorlog = normpath("c:/users/foxma/documents/github/avantiattachments/results/manual_fix_required.txt")
 
-def test_rev_in_filename_regex_picks_rev():
+
+def test_find_rev_regex_picks_rev():
     assert Search.find_rev("11371-93991111-Rev.C.pdf", errorlog) == "C"
     assert Search.find_rev("16420_SP93-1271_REVA1.pdf", errorlog) == "A1"
     assert Search.find_rev("11371-93991111-Rev. C.pdf", errorlog) == "C"
@@ -18,7 +19,7 @@ def test_rev_in_filename_regex_picks_rev():
     assert Search.find_rev("ECO 19711_DNC-107_REVA_Page_4N.jpg", errorlog) == "A"
 
 
-def test_rev_in_filename_regex_excludes_no_rev():
+def test_find_rev_regex_excludes_no_rev():
     assert Search.find_rev("11371-93991111-Rev.pdf", errorlog) is None
     assert Search.find_rev("11371-93991111-Rev.xls", errorlog) is None
     assert Search.find_rev("11371-93991111-Rev.png", errorlog) is None
