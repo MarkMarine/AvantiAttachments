@@ -1,5 +1,7 @@
 import re
 import os
+import shutil
+import datetime
 
 # Load both text files into memory
 
@@ -64,18 +66,30 @@ def create_new_part_name(data):
     return new_obj_name
 
 
-def iterate_over_list_create_objects(data, path, errorlog):
+def iterate_over_list_create_objects(data, path, errorlog, dstdir):
     with open(data, "r+") as f:  # open the data file assuming it's in the right format
         for line in f:  # look through each line
             if len(line) > 0:
                 num = split_rev_table_data(line)[0]
                 rev = split_rev_table_data(line)[1]
-                eco = split_rev_table_data(line)[2]
+                eco = split_rev_table_data(line)[2].rstrip('\n')
+                print(num + " " + rev + " at " + str(datetime.datetime.now()))
                 for root, dirs, files in os.walk(path):
-                    if eco in os.path.split(root):
+                    if eco in root:
                         for file in files:
                             if num in file and find_rev(file, errorlog) in rev:
-                                return file  # TODO fix the return from this function
+                                src_file = os.path.join(root, file)
+                                shutil.copy(src_file, dstdir)
+                                src_file_name, src_file_extension = os.path.splitext(src_file)
+                                new_file_name = create_new_part_name(line) + src_file_extension
+                                old_dst_file_name = dstdir + "\\" + file
+                                new_dst_file_name = os.path.join(dstdir, new_file_name)
+                                os.rename(old_dst_file_name, new_dst_file_name)
+                                print(create_new_part_name(line) + " from: " + os.path.join(root, file))
+
+
+
+
 
 
 # def generate_sample_index(attachments, revs):
