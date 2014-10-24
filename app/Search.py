@@ -24,16 +24,19 @@ import re
 # line by line of the ECO Table, check if there is a file with the <PARTNUMBER>-REV<###> format for each item number on
 # the ECO. If there is not, write that missing file to a log item_attachment_missing.txt with (item number, rev, ECO)
 
+
+def write_error_log(item, error, errorlog):
+    with open(errorlog, "a+") as fix_file:
+            fix_file.write("%s\t--%s\n" % (str(item), error))
+
+
 def find_rev(searchtext, errorlog):  # This searches a string for the revision character
     rev_keyword = re.compile("(rev|rev |rev-|rev_|rev\.|rev\. )([a-z0-9]{1,3})", re.IGNORECASE)
     # exclude_ext = re.compile("(pdf|png|xls|doc)", re.IGNORECASE)
     exclude_ext = ["pdf", "PDF", "png", "PNG", "xls", "doc", "DOC", "iew", "ise", "isi"]
     rev_twice = re.compile("(rev).*(rev)", re.IGNORECASE)
     if rev_twice.search(searchtext) is not None:
-        # write searchtext to a log file of manual fixes
-        with open(errorlog, "a+") as fix_file:
-            fix_file.write("%s\t--MULTIPLE REV ERROR\n" % str(searchtext))
-        return None
+        write_error_log(searchtext, "MULTIPLE REV ERROR", errorlog)  # write searchtext to a log file of manual fixes
     elif rev_keyword.search(searchtext) is not None:
         exclude = False
         for x in exclude_ext:
