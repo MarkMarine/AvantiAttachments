@@ -24,37 +24,25 @@ import re
 # line by line of the ECO Table, check if there is a file with the <PARTNUMBER>-REV<###> format for each item number on
 # the ECO. If there is not, write that missing file to a log item_attachment_missing.txt with (item number, rev, ECO)
 
-def find_rev(searchtext):  # This searches a string for the revision character
-    rev_no_space = re.compile("(Rev|rev|REV)([A-z0-9]{1,3})")
-    rev_w_space = re.compile("(Rev |rev |REV )([A-z0-9]{1,3})")
-    rev_w_dash = re.compile("(Rev-|rev-|REV-)([A-z0-9]{1,3})")
-    rev_w_dot = re.compile("(Rev\.|rev\.|REV\.)([A-z0-9]{1,3})")
-    rev_w_dot_space = re.compile("(Rev\. |rev\. |REV\. )([A-z0-9]{1,3})")
-    exclude_ext = ["pdf", "png", "xls"]
-    if rev_no_space.search(searchtext) is not None:
-        return rev_no_space.search(searchtext).group(2)
-    elif rev_w_space.search(searchtext) is not None:
-        return rev_w_space.search(searchtext).group(2)
-    elif rev_w_dash.search(searchtext) is not None:
-        return rev_w_dash.search(searchtext).group(2)
-    elif rev_w_dot.search(searchtext) is not None:
-        if rev_w_dot.search(searchtext).group(2) == exclude_ext[0]:
-            return None  # TODO see if we should return something else
-        elif rev_w_dot.search(searchtext).group(2) == exclude_ext[1]:
-            return None
-        elif rev_w_dot.search(searchtext).group(2) == exclude_ext[2]:
-            return None
+def find_rev(searchtext, errorlog):  # This searches a string for the revision character
+    rev_keyword = re.compile("(rev|rev |rev-|rev_|rev\.|rev\. )([a-z0-9]{1,3})", re.IGNORECASE)
+    # exclude_ext = re.compile("(pdf|png|xls|doc)", re.IGNORECASE)
+    exclude_ext = ["pdf", "PDF", "png", "PNG", "xls", "doc", "DOC", "iew", "ise", "isi"]
+    rev_twice = re.compile("(rev).*(rev)", re.IGNORECASE)
+    if rev_twice.search(searchtext) is not None:
+        # write searchtext to a log file of manual fixes
+        with open(errorlog, "a+") as fix_file:
+            fix_file.write("%s\t--MULTIPLE REV ERROR\n" % str(searchtext))
+        return None
+    elif rev_keyword.search(searchtext) is not None:
+        exclude = False
+        for x in exclude_ext:
+            if rev_keyword.search(searchtext).group(2) == x:  # TODO fix exclude list search
+                exclude = True
+        if not exclude:
+            return rev_keyword.search(searchtext).group(2)
         else:
-            return rev_w_dot.search(searchtext).group(2)
-    elif rev_w_dot_space.search(searchtext) is not None:
-        if rev_w_dot_space.search(searchtext).group(2) == exclude_ext[0]:
-            return None  # TODO see if we should return something else
-        elif rev_w_dot_space.search(searchtext).group(2) == exclude_ext[1]:
             return None
-        elif rev_w_dot_space.search(searchtext).group(2) == exclude_ext[2]:
-            return None
-        else:
-            return rev_w_dot_space.search(searchtext).group(2)
     else:
         pass  # TODO make sure pass is appropriate here
 
@@ -68,9 +56,11 @@ def new_rev_search(partnum, econum):
     pass  # TODO fill in this function
 
 
+errorlog = "results/manual_fix_required.txt"
+
 def generate_sample_index(attachments, revs):
     with open(attachments, 'r') as attachment_index, open(revs, 'r') as revtable:
         for line in attachment_index:
-            if find_rev(line) is not None:
-                print("%s   ---   %s" % (find_rev(line), line))
+            if find_rev(line, errorlog) is not None:
+                print("%s   ---   %s" % (find_rev(line, errorlog), line))
             # pass  # TODO Fill in this function

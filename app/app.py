@@ -18,3 +18,11 @@ def create_path_index(locations):
                     my_file.close()
         else:
             raise TypeError("Path Doesn't Exist")
+
+
+ext = '.pdf'  # TODO Fix this extension logic
+# TODO this is just there for example code from stack overflow
+def walk_through_files(source_dir):
+    for dirName, subdirList, fileList in os.walk(source_dir):
+        if not any(os.path.splitext(fileName)[1].lower() == ext for fileName in fileList):
+            pass
