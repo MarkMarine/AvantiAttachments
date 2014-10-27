@@ -47,8 +47,29 @@ def test_create_new_part_name():
     assert create_new_part_name(data) == "100016209-REV-00D"
 
 
+def test_filter_zeros_from_rev():
+    assert filter_zeros_from_rev("00A") == "A"
+    assert filter_zeros_from_rev("0A1") == "A1"
+
+
+def test_is_a_bom_redline():
+    file_true1 = 'ECO 10884-BOM-100016209-RevA-Chges.pdf'
+    file_true2 = 'ECO 10884_BOM_100016209-RevA-Chges.pdf'
+    file_true3 = 'ECO 10884 BOM 100016209-RevA-Chges.pdf'
+    file_false1 = 'ECO 10884BOM100016209-RevA-Chges.pdf'
+    file_false2 = 'ECO 10884 BOMBPROOF 100016209-RevA-Chges.pdf'
+    file_false3 = 'ECO 10884-BOMBPROOF-100016209-RevA-Chges.pdf'
+    assert is_a_bom_redline(file_true1) == True
+    assert is_a_bom_redline(file_true2) == True
+    assert is_a_bom_redline(file_true3) == True
+    assert is_a_bom_redline(file_false1) == False
+    assert is_a_bom_redline(file_false2) == False
+    assert is_a_bom_redline(file_false3) == False
+
+
 def test_iterate_over_list_create_objects():
     data = normpath("c:/users/foxma/documents/github/avantiattachments/indexes/sample_REVT.txt")
     path = normpath("c:/users/foxma/documents/github/avantiattachments/samples")
     errorlog = normpath("c:/users/foxma/documents/github/avantiattachments/results/manual_fix_required.txt")
-    assert iterate_over_list_create_objects(data, path, errorlog) == "ECO-18832-100015940-RevD.pdf"
+    dist_dir = normpath("c:/users/foxma/documents/github/avantiattachments/results")
+    assert iterate_over_list_create_objects(data, path, errorlog, dist_dir) == "ECO-18832-100015940-RevD.pdf"
