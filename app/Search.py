@@ -2,10 +2,22 @@ import re
 import os
 import shutil
 import csv
+# from timer import Timer
+import cProfile
 
-from app.timer import Timer
 
+def do_cprofile(func):
+    def profiled_func(*args, **kwargs):
+        profile = cProfile.Profile()
+        try:
+            profile.enable()
+            result = func(*args, **kwargs)
+            profile.disable()
+            return result
+        finally:
+            profile.print_stats()
 
+    return profiled_func
 
 
 # region Description of Functions
@@ -35,9 +47,6 @@ from app.timer import Timer
 # endregion
 
 
-# debug_log = "results/debug_log.txt"  # TODO move this variable out of file
-
-
 def write_log(item, log, error=""):
     with open(log, "a+") as f:
         if len(error) > 0:
@@ -47,7 +56,7 @@ def write_log(item, log, error=""):
 
 
 def find_rev(searchtext, log, debug=False, debug_log=""):  # This searches a string for the revision character
-    rev_keyword = re.compile("(rev|rev |rev-|rev_|rev\.|rev\. )([a-z0-9]{1,3})", re.IGNORECASE)
+    rev_keyword = re.compile("(rev[ \\-_\\.]*?)([a-z0-9]{1,3})", re.IGNORECASE)
     # exclude_ext = re.compile("(pdf|png|xls|doc)", re.IGNORECASE)
     exclude_ext = ["pdf", "PDF", "png", "PNG", "xls", "doc", "DOC", "iew", "ise", "isi"]
     rev_twice = re.compile("(rev).*(rev)", re.IGNORECASE)
@@ -110,7 +119,8 @@ def is_a_bom_redline(x):
 
 def is_material_spec(x):
     ms_keyword = re.compile("([\W_]MS[\W_])", re.IGNORECASE)
-    if ms_keyword.search(x) is not None:
+    ms_start_keyword = re.compile("(MS[\W_])", re.IGNORECASE)
+    if ms_keyword.search(x) is not None or ms_start_keyword.match(x) is not None:
         return True
     else:
         return False
@@ -207,41 +217,51 @@ def debug_copy(num, rev, eco, root, file, line, dstdir, result_log, debug=False,
                 ii += 1
 
 
+@do_cprofile
 def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_log, debug=False, debug_log=""):
     with open(data, "r+") as f:  # open the data file assuming it's in the right format
-        total_for_counter = 1
-        elapsed_time = 0
+        # total_for_counter = 1
+        # elapsed_time = 0
         for line in f:  # look through each line
-            with Timer() as t:
-                if len(line) > 0:
-                    num = split_rev_table_data(line)[0]
-                    rev = split_rev_table_data(line)[1]
-                    eco = split_rev_table_data(line)[2].rstrip('\n')
-                    with open(index_file, newline='', encoding='utf-8') as fi:
-                        reader = csv.reader(fi, delimiter='\t')
-                        for row in reader:
-                            root = row[0]
-                            file = row[1]
-                            if is_item_attachment(num, file, eco, rev, root, errorlog, debug, debug_log):
-                                if not debug:
-                                    perform_copy(num, rev, eco, root, file, line, dstdir, result_log)
-                                else:
-                                    debug_copy(num, rev, eco, root, file, line, dstdir, result_log, debug, debug_log)
+            # with Timer() as t:
+            if len(line) > 0:
+                num = split_rev_table_data(line)[0]
+                rev = split_rev_table_data(line)[1]
+                eco = split_rev_table_data(line)[2].rstrip('\n')
+                with open(index_file, newline='', encoding='utf-8') as fi:
+                    reader = csv.reader(fi, delimiter='\t')
+                    for row in reader:
+                        root = row[0]
+                        file = row[1]
+                        if is_item_attachment(num, file, eco, rev, root, errorlog, debug, debug_log):
+                            if not debug:
+                                perform_copy(num, rev, eco, root, file, line, dstdir, result_log)
+                            else:
+                                debug_copy(num, rev, eco, root, file, line, dstdir, result_log, debug, debug_log)
 
-                            elif num in file and eco in root and is_new_rev_folder(root) and not \
-                                    is_material_spec(file) and not is_a_bom_redline(file):
-                                if not debug:
-                                    perform_copy(num, rev, eco, root, file, line, dstdir, result_log)
-                                else:
-                                    debug_copy(num, rev, eco, root, file, line, dstdir, result_log, debug, debug_log)
+                        elif num in file and eco in root and is_new_rev_folder(root) and not \
+                                is_material_spec(file) and not is_a_bom_redline(file):
+                            if not debug:
+                                perform_copy(num, rev, eco, root, file, line, dstdir, result_log)
+                            else:
+                                debug_copy(num, rev, eco, root, file, line, dstdir, result_log, debug, debug_log)
 
-                else:  # line length == 0
-                    write_log("line: %s" % line, errorlog, "Zero length line")
-            elapsed_time = elapsed_time + t.secs
-            total_for_counter += 1
-            average_time = elapsed_time/total_for_counter
-            estimated_time_left = ((23667 - total_for_counter) * average_time)/60
-            if total_for_counter % 50 == 0:
-                print("=> average time: %s s -- estimate remaining: %s m" % (average_time, estimated_time_left))
-            if estimated_time_left < 1:
-                write_log("=> average time: %s s\t-- total time: %s m" % (average_time, elapsed_time), result_log)
+            else:  # line length == 0
+                write_log("line: %s" % line, errorlog, "Zero length line")
+                # elapsed_time = elapsed_time + t.secs
+                # total_for_counter += 1
+                # average_time = elapsed_time/total_for_counter
+                # estimated_time_left = ((1000 - total_for_counter) * average_time)/60
+                # if total_for_counter % 50 == 0:
+                # print("=> average time: %s s -- estimate remaining: %s m" % (average_time, estimated_time_left))
+                # if estimated_time_left < 1:
+                #     write_log("=> average time: %s s\t-- total time: %s m" % (average_time, elapsed_time), result_log)
+
+# result = iterate_over_list_create_objects(
+# os.path.normpath("c:/users/foxma/documents/github/avantiattachments/indexes/ItemNewRevW_O_sftwr.txt"),
+#     os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/error_log.txt"),
+#     os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results"),
+#     os.path.normpath("c:/users/foxma/documents/github/avantiattachments/indexes/local_att_delim.txt"),
+#     os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/results_log.txt"),
+#     True,
+#     os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/debug_log.txt"))
