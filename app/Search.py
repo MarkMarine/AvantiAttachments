@@ -32,7 +32,10 @@ import csv
 
 def write_log(item, log, error=""):
     with open(log, "a+") as f:
-        f.write("%s\t--%s\n" % (str(item), error))
+        if len(error) > 0:
+            f.write("%s\t--%s\n" % (str(item), error))
+        else:
+            f.write("%s\n" % str(item))
 
 
 def find_rev(searchtext, errorlog):  # This searches a string for the revision character
@@ -120,6 +123,8 @@ def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_
                                 new_dst_file_name = os.path.join(dstdir, new_file_name)
                                 if not os.path.exists(new_dst_file_name):
                                     shutil.copy(src_file, new_dst_file_name)
+                                    write_log(("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" %
+                                               (num, rev, eco, src_file, new_file_name)), result_log)
                                 else:
                                     ii = 1
                                     while True:
@@ -128,5 +133,12 @@ def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_
                                         new_name_path = os.path.join(dstdir, new_name)
                                         if not os.path.exists(new_name_path):
                                             shutil.copy(src_file, new_name_path)
+                                            write_log(("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" %
+                                                       (num, rev, eco, src_file, new_name)), result_log)
                                             break
-                                        ii += 1  # Copy the pdf to a single folder
+                                        ii += 1
+                                        # extension doesn't == ".pdf"
+                                        # isn't a drawing we want to copy. Don't log, it iterates over and over the list and clogs the
+                                        # log file
+            else:  # line length == 0
+                write_log("line: %s" % line, errorlog, "Zero length line")
