@@ -11,4 +11,4 @@ __author__ = 'foxma'
 #
 #
 # def run_iterate(data, error_log, dstdir, index_file, results_log, debug, debug_log):
-# print(iterate_over_list_create_objects(data, error_log, dstdir, index_file, results_log, debug, debug_log))
+# print(search_and_copy_part_attachments(data, error_log, dstdir, index_file, results_log, debug, debug_log))
