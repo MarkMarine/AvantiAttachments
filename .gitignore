@@ -2,3 +2,5 @@
 samples/
 results/
 app/__pycache__/
+app/tests/__pycache__/test_Search.cpython-34-PYTEST.pyc
+indexes/local_attachments.txt
