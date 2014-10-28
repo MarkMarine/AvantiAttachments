@@ -1,9 +1,9 @@
 import re
 import os
 import shutil
-import sys
 import csv
 
+# region Description of Functions
 # Load both text files into memory
 
 # Save a doc for loading into the item attachments for each revision:
@@ -27,6 +27,7 @@ import csv
 # line by line of the ECO Table, check if there is a file with the <PARTNUMBER>-REV<###> format for each item number on
 # the ECO. If there is not, write that missing file to a log item_attachment_missing.txt with (item number, rev, ECO)
 # errorlog = os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/manual_fix_required.txt")
+# endregion
 
 
 def write_log(item, log, error=""):
@@ -98,7 +99,7 @@ def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_
             if len(line) > 0:
                 num = split_rev_table_data(line)[0]
                 rev = split_rev_table_data(line)[1]
-                eco = split_rev_table_data(line)[2].rstrip('\n')
+                # eco = split_rev_table_data(line)[2].rstrip('\n')
                 with open(index_file, newline='', encoding='utf-8') as fi:
                     reader = csv.reader(fi, delimiter='\t')
                     for row in reader:
@@ -115,151 +116,17 @@ def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_
                             if src_file_extension == ".pdf":
                                 # right now I only want to get pdf files because that is the data we have
                                 # TODO pull the hardcode .pdf extension out of here and make it selectable
-                                shutil.copy(src_file, dstdir)  # Copy the pdf to a single folder
                                 new_file_name = create_new_part_name(line) + src_file_extension  # get a new name
                                 old_dst_file_name = dstdir + "\\" + file
                                 new_dst_file_name = os.path.join(dstdir, new_file_name)
-                                try:
-                                    os.rename(old_dst_file_name, new_dst_file_name)  # try to rename it according to
-                                    # our file rename standards
-                                    print(create_new_part_name(line) + " from: " + os.path.join(root, file))
-                                    write_log(create_new_part_name(line) + " from: " + os.path.join(root, file),
-                                              result_log)
-                                    # print the rename results to the terminal for testing
-                                    # TODO make this a debug level print
-                                except FileExistsError:
-                                    try:
-                                        new_file_name = create_new_part_name(line) + "(1)" + src_file_extension
-                                        new_dst_file_name = os.path.join(dstdir, new_file_name)
-                                        os.rename(old_dst_file_name, new_dst_file_name)  # try to rename it according to
-                                        # our file rename standards
-                                        print(create_new_part_name(line) + "(1)" + " from: " + os.path.join(root, file))
-                                        write_log(new_file_name, result_log, "File Exists, Rename Performed")
-                                    except FileExistsError:
-                                        try:
-                                            new_file_name = create_new_part_name(line) + "(2)" + src_file_extension
-                                            new_dst_file_name = os.path.join(dstdir, new_file_name)
-                                            os.rename(old_dst_file_name,
-                                                      new_dst_file_name)  # try to rename it according to
-                                            # our file rename standards
-                                            print(create_new_part_name(line) + "(2)" + " from: " + os.path.join(root,
-                                                                                                                file))
-                                            write_log(new_file_name, result_log, "File Exists, Rename Performed")
-                                        except FileExistsError:
-                                            try:
-                                                new_file_name = create_new_part_name(line) + "(3)" + src_file_extension
-                                                new_dst_file_name = os.path.join(dstdir, new_file_name)
-                                                os.rename(old_dst_file_name,
-                                                          new_dst_file_name)  # try to rename it according to
-                                                # our file rename standards
-                                                print(
-                                                    create_new_part_name(line) + "(3)" + " from: " + os.path.join(root,
-                                                                                                                  file))
-                                                write_log(new_file_name, result_log, "File Exists, Rename Performed")
-                                            except FileExistsError:
-                                                try:
-                                                    new_file_name = create_new_part_name(
-                                                        line) + "(4)" + src_file_extension
-                                                    new_dst_file_name = os.path.join(dstdir, new_file_name)
-                                                    os.rename(old_dst_file_name,
-                                                              new_dst_file_name)  # try to rename it according to
-                                                    # our file rename standards
-                                                    print(create_new_part_name(line) + "(4)" + " from: " + os.path.join(
-                                                        root, file))
-                                                    write_log(new_file_name, result_log,
-                                                              "File Exists, Rename Performed")
-                                                except FileExistsError:
-                                                    try:
-                                                        new_file_name = create_new_part_name(
-                                                            line) + "(5)" + src_file_extension
-                                                        new_dst_file_name = os.path.join(dstdir, new_file_name)
-                                                        os.rename(old_dst_file_name,
-                                                                  new_dst_file_name)  # try to rename it according to
-                                                        # our file rename standards
-                                                        print(create_new_part_name(
-                                                            line) + "(5)" + " from: " + os.path.join(root, file))
-                                                        write_log(new_file_name, result_log,
-                                                                  "File Exists, Rename Performed")
-                                                    except FileExistsError:
-                                                        try:
-                                                            new_file_name = create_new_part_name(
-                                                                line) + "(6)" + src_file_extension
-                                                            new_dst_file_name = os.path.join(dstdir, new_file_name)
-                                                            os.rename(old_dst_file_name,
-                                                                      new_dst_file_name)  # try to rename it according to
-                                                            # our file rename standards
-                                                            print(create_new_part_name(
-                                                                line) + "(6)" + " from: " + os.path.join(root, file))
-                                                            write_log(new_file_name, result_log,
-                                                                      "File Exists, Rename Performed")
-                                                        except:
-                                                            e = sys.exc_info()[0]
-                                                            write_log(new_file_name, errorlog, "%s" % e)
-
-
-
-
-                                                            # TODO replace nested excepts with this:
-                                                            # movdir = r"C:\Scans"
-                                                            # basedir = r"C:\Links"
-                                                            # Walk through all files in the directory that contains the files to copy
-                                                            # for root, dirs, files in os.walk(movdir):
-                                                            # for filename in files:
-                                                            # # I use absolute path, case you want to move several dirs.
-                                                            # old_name = os.path.join( os.path.abspath(root), filename )
-                                                            #
-                                                            #         # Separate base from extension
-                                                            #         base, extension = os.path.splitext(filename)
-                                                            #
-                                                            #         # Initial new name
-                                                            #         new_name = os.path.join(basedir, base, filename)
-                                                            #
-                                                            #         # If folder basedir/base does not exist... You don't want to create it?
-                                                            #         if not os.path.exists(os.path.join(basedir, base)):
-                                                            #             print os.path.join(basedir,base), "not found"
-                                                            #             continue    # Next filename
-                                                            #         elif not os.path.exists(new_name):  # folder exists, file does not
-                                                            #             shutil.copy(old_name, new_name)
-                                                            #         else:  # folder exists, file exists as well
-                                                            #             ii = 1
-                                                            #             while True:
-                                                            #                 new_name = os.path.join(basedir,base, base + "_" + str(ii) + extension)
-                                                            #                 if os.path.exists(newname):
-                                                            #                    shutil.copy(old_name, new_name)
-                                                            #                    print "Copied", old_name, "as", new_name
-                                                            #                    break
-                                                            #                 ii += 1
-
-
-
-                                                            # for root, dirs, files in os.walk(path):
-                                                            # # for every directory, return a list of all the files in each root dir
-                                                            # if eco in root:
-                                                            # # Check each root dir path for the eco number
-                                                            #         for file in files:
-                                                            #             # iterate through the list of files returned for the root(s) that have the ECO num in it
-                                                            #             if num in file and find_rev(file, errorlog) is not None \
-                                                            #                     and find_rev(file, errorlog) == filter_zeros_from_rev(rev) and not \
-                                                            #                     is_material_spec(file) and not is_a_bom_redline(file):  # TODO refactor this
-                                                            #                 # If the file has the part number we're looking for in it, and we can extract the rev
-                                                            #                 # and the rev matches what we're looking for, and it's not a mat spec or bom redline,
-                                                            #                 # then we'll consider it our part number + rev combo
-                                                            #                 src_file = os.path.join(root, file)
-                                                            #                 src_file_name, src_file_extension = os.path.splitext(src_file)
-                                                            #                 if src_file_extension == ".pdf":
-                                                            #                     # right now I only want to get pdf files because that is the data we have
-                                                            #                     # TODO pull the hardcode .pdf extension out of here and make it selectable
-                                                            #                     shutil.copy(src_file, dstdir)  # Copy the pdf to a single folder
-                                                            #                     new_file_name = create_new_part_name(line) + src_file_extension  # get a new name
-                                                            #                     old_dst_file_name = dstdir + "\\" + file
-                                                            #                     new_dst_file_name = os.path.join(dstdir, new_file_name)
-                                                            #                     try:
-                                                            #                         os.rename(old_dst_file_name, new_dst_file_name)  # try to rename it according to
-                                                            #                         # our file rename standards
-                                                            #                         print(create_new_part_name(line) + " from: " + os.path.join(root, file))
-                                                            #                         # print the rename results to the terminal for testing
-                                                            #                         # TODO make this a debug level print
-                                                            #                     except:
-                                                            #                         e = sys.exc_info()[0]
-                                                            #                         print("Error: %s for data line: %s file: %s " % (e, line, file))
-
+                                if not os.path.exists(new_dst_file_name):
+                                    shutil.copy(old_dst_file_name, new_dst_file_name)
+                                else:
+                                    ii = 1
+                                    while True:
+                                        new_name = os.path.join(create_new_part_name(line) + "(" + str(ii) + ")" \
+                                                                + src_file_extension)
+                                        if os.path.exists(new_name):
+                                            shutil.copy(src_file, new_name)
+                                            break
+                                        ii += 1  # Copy the pdf to a single folder
