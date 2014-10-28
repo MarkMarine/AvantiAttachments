@@ -56,36 +56,17 @@ def write_log(item, log, error=""):
 
 
 def find_rev(searchtext, log, debug=False, debug_log=""):  # This searches a string for the revision character
-    rev_keyword = re.compile("(rev[ \\-_\\.]*?)([a-z0-9]{1,3})", re.IGNORECASE)
-    # exclude_ext = re.compile("(pdf|png|xls|doc)", re.IGNORECASE)
-    exclude_ext = ["pdf", "PDF", "png", "PNG", "xls", "doc", "DOC", "iew", "ise", "isi"]
+    rev_keyword = re.compile("(rev[ \-_\.]*?)((?!isi|ise|iew|pdf)[a-z0-9]{1,3})", re.IGNORECASE)
     rev_twice = re.compile("(rev).*(rev)", re.IGNORECASE)
     if rev_twice.search(searchtext) is not None:
         write_log(searchtext, log, "MULTIPLE REVS IN NAME ERROR")
+        return None
     elif rev_keyword.search(searchtext) is not None:
-        if debug:
-            write_log("%s\trev_keyword.search is:\t%s\tnot None" %
-                      (searchtext, rev_keyword.search(searchtext)), debug_log)
-        exclude = False
-        for x in exclude_ext:
-            if rev_keyword.search(searchtext).group(2) == x:  # TODO fix exclude list search
-                if debug:
-                    write_log("%s\tif rev_keyword:\t%s\t==\t%s\tis True, exclude" %
-                              (searchtext, rev_keyword.search(searchtext).group(2), x), debug_log)
-                exclude = True
-        if not exclude:
-            if debug:
-                write_log("%s\tNot Exclude, so return\t%s" %
-                          (searchtext, rev_keyword.search(searchtext).group(2)), debug_log)
-            return rev_keyword.search(searchtext).group(2)
-        else:
-            if debug:
-                write_log("else return None:\t%s\t", debug_log)
-            return None
+        return rev_keyword.search(searchtext).group(2)
     else:
         if debug:
             write_log("else PASS\tvalue:\t%s" % searchtext, debug_log)
-        pass  # TODO make sure pass is appropriate here
+        return None  # TODO make sure pass is appropriate here
 
 
 # TODO refactor find_rev to be simple
@@ -139,7 +120,7 @@ def is_item_attachment(num, file, eco, rev, root, errorlog, debug=False, debug_l
                 if not is_a_bom_redline(file):
                     if debug:
                         write_log("TRUE is not BOM Redline:\t%s\tSEARCH REV:\t%s" % (file, rev), debug_log)
-                    if find_rev(file, errorlog, debug, debug_log) == filter_zeros_from_rev(rev):
+                    if find_rev(os.path.splitext(file)[0], errorlog, debug, debug_log) == filter_zeros_from_rev(rev):
                         if debug:
                             write_log("TRUE find_rev:\t%s\t== rev:%s\t%s" %
                                       (file, rev, filter_zeros_from_rev(rev)), debug_log)
@@ -257,11 +238,12 @@ def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_
                 # if estimated_time_left < 1:
                 #     write_log("=> average time: %s s\t-- total time: %s m" % (average_time, elapsed_time), result_log)
 
-# result = iterate_over_list_create_objects(
-# os.path.normpath("c:/users/foxma/documents/github/avantiattachments/indexes/ItemNewRevW_O_sftwr.txt"),
-#     os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/error_log.txt"),
-#     os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results"),
-#     os.path.normpath("c:/users/foxma/documents/github/avantiattachments/indexes/local_att_delim.txt"),
-#     os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/results_log.txt"),
-#     True,
-#     os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/debug_log.txt"))
+
+result = iterate_over_list_create_objects(
+    os.path.normpath("c:/users/foxma/documents/github/avantiattachments/indexes/ItemNewRevW_O_sftwr.txt"),
+    os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/error_log.txt"),
+    os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results"),
+    os.path.normpath("c:/users/foxma/documents/github/avantiattachments/indexes/local_att_delim.txt"),
+    os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/results_log.txt"),
+    True,
+    os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/debug_log.txt"))

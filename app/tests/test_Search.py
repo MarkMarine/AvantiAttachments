@@ -20,8 +20,6 @@ def test_find_rev_regex_picks_rev():
 def test_find_rev_regex_excludes_no_rev():
     errorlog = normpath("c:/users/foxma/documents/github/avantiattachments/results/manual_fix_required.txt")
     assert find_rev("11371-93991111-Rev.pdf", errorlog) is None
-    assert find_rev("11371-93991111-Rev.xls", errorlog) is None
-    assert find_rev("11371-93991111-Rev.png", errorlog) is None
     assert find_rev("11371-93991111-rev. .pdf", errorlog) is None
     assert find_rev("11371-93991111-rev..pdf", errorlog) is None
 
@@ -65,6 +63,21 @@ def test_is_a_bom_redline():
     assert is_a_bom_redline(file_false1) == False
     assert is_a_bom_redline(file_false2) == False
     assert is_a_bom_redline(file_false3) == False
+
+
+def test_is_material_spec():
+    assert is_material_spec("C:\\AVANTI\\ECP-ECO 2013\\19679\\NEW REVISIONS\\MS_100005039.pdf") == True
+    assert is_material_spec("MS_100005039.pdf") == True
+    assert is_material_spec("MS 100005039.pdf") == True
+    assert is_material_spec("msa_100005039.pdf") == False
+    assert is_material_spec(" msa_100005039.pdf") == False
+    assert is_material_spec("ms1_100005039.pdf") == False
+    assert is_material_spec("asdfms_100005039.pdf") == False
+
+
+# def test_for_wrong_rev():
+
+
 
 # TODO this isn't even close to checking the new functionality. fix
 # def test_iterate_over_list_create_objects():
