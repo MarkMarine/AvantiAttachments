@@ -99,13 +99,13 @@ def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_
             if len(line) > 0:
                 num = split_rev_table_data(line)[0]
                 rev = split_rev_table_data(line)[1]
-                # eco = split_rev_table_data(line)[2].rstrip('\n')
+                eco = split_rev_table_data(line)[2].rstrip('\n')
                 with open(index_file, newline='', encoding='utf-8') as fi:
                     reader = csv.reader(fi, delimiter='\t')
                     for row in reader:
                         root = row[0]
                         file = row[1]
-                        if num in file and find_rev(file, errorlog) is not None \
+                        if num in file and eco in root and find_rev(file, errorlog) is not None \
                                 and find_rev(file, errorlog) == filter_zeros_from_rev(rev) and not \
                                 is_material_spec(file) and not is_a_bom_redline(file):  # TODO refactor this
                             # If the file has the part number we're looking for in it, and we can extract the rev
