@@ -107,19 +107,22 @@ def is_new_rev_folder(directory):
         return False
 
 
-def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_log):
+def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_log, debug=False):
     with open(data, "r+") as f:  # open the data file assuming it's in the right format
+        total_for_counter = 1
+        elapsed_time = 0
         for line in f:  # look through each line
-            if len(line) > 0:
-                num = split_rev_table_data(line)[0]
-                rev = split_rev_table_data(line)[1]
-                eco = split_rev_table_data(line)[2].rstrip('\n')
-                with open(index_file, newline='', encoding='utf-8') as fi:
-                    reader = csv.reader(fi, delimiter='\t')
-                    for row in reader:
-                        root = row[0]
-                        file = row[1]
-                        with Timer() as t:
+            with Timer() as t:
+                if len(line) > 0:
+                    num = split_rev_table_data(line)[0]
+                    rev = split_rev_table_data(line)[1]
+                    eco = split_rev_table_data(line)[2].rstrip('\n')
+                    with open(index_file, newline='', encoding='utf-8') as fi:
+                        reader = csv.reader(fi, delimiter='\t')
+                        for row in reader:
+                            root = row[0]
+                            file = row[1]
+                            #with Timer() as t:
                             if num in file and eco in root and find_rev(file, errorlog) is not None \
                                     and find_rev(file, errorlog) == filter_zeros_from_rev(rev) and not \
                                     is_material_spec(file) and not is_a_bom_redline(file):  # TODO refactor this
@@ -140,7 +143,7 @@ def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_
                                     else:
                                         ii = 1
                                         while True:
-                                            new_name = os.path.join(create_new_part_name(line) + "(" + str(ii) + ")" \
+                                            new_name = os.path.join(create_new_part_name(line) + "(" + str(ii) + ")"
                                                                     + src_file_extension)
                                             new_name_path = os.path.join(dstdir, new_name)
                                             if not os.path.exists(new_name_path):
@@ -149,9 +152,6 @@ def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_
                                                            (num, rev, eco, src_file, new_name)), result_log)
                                                 break
                                             ii += 1
-                                            # extension doesn't == ".pdf"
-                                            # isn't a drawing we want to copy. Don't log, it iterates over and over the list and clogs the
-                                            # log file
 
                             elif num in file and eco in root and is_new_rev_folder(root) and not \
                                     is_material_spec(file) and not is_a_bom_redline(file):
@@ -178,6 +178,12 @@ def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_
                                                            (num, rev, eco, src_file, new_name)), result_log)
                                                 break
                                             ii += 1
-                        print("=> elasped lpush: %s s" % t.secs)
-            else:  # line length == 0
-                write_log("line: %s" % line, errorlog, "Zero length line")
+                            #print("=> elasped test IF: %s s" % t.secs)
+                else:  # line length == 0
+                    write_log("line: %s" % line, errorlog, "Zero length line")
+            # print("=> elasped test loop: %s s" % t.secs)
+            elapsed_time = elapsed_time + t.secs
+            total_for_counter += 1
+            average_time = elapsed_time/total_for_counter
+            estimated_time_left = ((23667 - total_for_counter) * average_time)/60
+            print("=> average time: %s s -- estimate remaining: %s m" % (average_time, estimated_time_left))
