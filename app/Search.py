@@ -117,16 +117,16 @@ def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_
                                 # right now I only want to get pdf files because that is the data we have
                                 # TODO pull the hardcode .pdf extension out of here and make it selectable
                                 new_file_name = create_new_part_name(line) + src_file_extension  # get a new name
-                                old_dst_file_name = dstdir + "\\" + file
                                 new_dst_file_name = os.path.join(dstdir, new_file_name)
                                 if not os.path.exists(new_dst_file_name):
-                                    shutil.copy(old_dst_file_name, new_dst_file_name)
+                                    shutil.copy(src_file, new_dst_file_name)
                                 else:
                                     ii = 1
                                     while True:
                                         new_name = os.path.join(create_new_part_name(line) + "(" + str(ii) + ")" \
                                                                 + src_file_extension)
-                                        if os.path.exists(new_name):
-                                            shutil.copy(src_file, new_name)
+                                        new_name_path = os.path.join(dstdir, new_name)
+                                        if not os.path.exists(new_name_path):
+                                            shutil.copy(src_file, new_name_path)
                                             break
                                         ii += 1  # Copy the pdf to a single folder
