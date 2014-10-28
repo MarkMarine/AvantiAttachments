@@ -3,6 +3,9 @@ import os
 import shutil
 import csv
 
+from app.timer import Timer
+
+
 # region Description of Functions
 # Load both text files into memory
 
@@ -116,63 +119,65 @@ def iterate_over_list_create_objects(data, errorlog, dstdir, index_file, result_
                     for row in reader:
                         root = row[0]
                         file = row[1]
-                        if num in file and eco in root and find_rev(file, errorlog) is not None \
-                                and find_rev(file, errorlog) == filter_zeros_from_rev(rev) and not \
-                                is_material_spec(file) and not is_a_bom_redline(file):  # TODO refactor this
-                            # If the file has the part number we're looking for in it, and we can extract the rev
-                            # and the rev matches what we're looking for, and it's not a mat spec or bom redline,
-                            # then we'll consider it our part number + rev combo
-                            src_file = os.path.join(root, file)
-                            src_file_name, src_file_extension = os.path.splitext(src_file)
-                            if src_file_extension == ".pdf":
-                                # right now I only want to get pdf files because that is the data we have
-                                # TODO pull the hardcode .pdf extension out of here and make it selectable
-                                new_file_name = create_new_part_name(line) + src_file_extension  # get a new name
-                                new_dst_file_name = os.path.join(dstdir, new_file_name)
-                                if not os.path.exists(new_dst_file_name):
-                                    shutil.copy(src_file, new_dst_file_name)
-                                    write_log(("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" %
-                                               (num, rev, eco, src_file, new_file_name)), result_log)
-                                else:
-                                    ii = 1
-                                    while True:
-                                        new_name = os.path.join(create_new_part_name(line) + "(" + str(ii) + ")" \
-                                                                + src_file_extension)
-                                        new_name_path = os.path.join(dstdir, new_name)
-                                        if not os.path.exists(new_name_path):
-                                            shutil.copy(src_file, new_name_path)
-                                            write_log(("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" %
-                                                       (num, rev, eco, src_file, new_name)), result_log)
-                                            break
-                                        ii += 1
-                                        # extension doesn't == ".pdf"
-                                        # isn't a drawing we want to copy. Don't log, it iterates over and over the list and clogs the
-                                        # log file
+                        with Timer() as t:
+                            if num in file and eco in root and find_rev(file, errorlog) is not None \
+                                    and find_rev(file, errorlog) == filter_zeros_from_rev(rev) and not \
+                                    is_material_spec(file) and not is_a_bom_redline(file):  # TODO refactor this
+                                # If the file has the part number we're looking for in it, and we can extract the rev
+                                # and the rev matches what we're looking for, and it's not a mat spec or bom redline,
+                                # then we'll consider it our part number + rev combo
+                                src_file = os.path.join(root, file)
+                                src_file_name, src_file_extension = os.path.splitext(src_file)
+                                if src_file_extension == ".pdf":
+                                    # right now I only want to get pdf files because that is the data we have
+                                    # TODO pull the hardcode .pdf extension out of here and make it selectable
+                                    new_file_name = create_new_part_name(line) + src_file_extension  # get a new name
+                                    new_dst_file_name = os.path.join(dstdir, new_file_name)
+                                    if not os.path.exists(new_dst_file_name):
+                                        shutil.copy(src_file, new_dst_file_name)
+                                        write_log(("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" %
+                                                   (num, rev, eco, src_file, new_file_name)), result_log)
+                                    else:
+                                        ii = 1
+                                        while True:
+                                            new_name = os.path.join(create_new_part_name(line) + "(" + str(ii) + ")" \
+                                                                    + src_file_extension)
+                                            new_name_path = os.path.join(dstdir, new_name)
+                                            if not os.path.exists(new_name_path):
+                                                shutil.copy(src_file, new_name_path)
+                                                write_log(("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" %
+                                                           (num, rev, eco, src_file, new_name)), result_log)
+                                                break
+                                            ii += 1
+                                            # extension doesn't == ".pdf"
+                                            # isn't a drawing we want to copy. Don't log, it iterates over and over the list and clogs the
+                                            # log file
 
-                        elif num in file and eco in root and is_new_rev_folder(root) and not \
-                                is_material_spec(file) and not is_a_bom_redline(file):
-                            src_file = os.path.join(root, file)
-                            src_file_name, src_file_extension = os.path.splitext(src_file)
-                            if src_file_extension == ".pdf":
-                                # right now I only want to get pdf files because that is the data we have
-                                # TODO pull the hardcode .pdf extension out of here and make it selectable
-                                new_file_name = create_new_part_name(line) + src_file_extension  # get a new name
-                                new_dst_file_name = os.path.join(dstdir, new_file_name)
-                                if not os.path.exists(new_dst_file_name):
-                                    shutil.copy(src_file, new_dst_file_name)
-                                    write_log(("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" %
-                                               (num, rev, eco, src_file, new_file_name)), result_log)
-                                else:
-                                    ii = 1
-                                    while True:
-                                        new_name = os.path.join(create_new_part_name(line) + "(" + str(ii) + ")" \
-                                                                + src_file_extension)
-                                        new_name_path = os.path.join(dstdir, new_name)
-                                        if not os.path.exists(new_name_path):
-                                            shutil.copy(src_file, new_name_path)
-                                            write_log(("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" %
-                                                       (num, rev, eco, src_file, new_name)), result_log)
-                                            break
-                                        ii += 1
+                            elif num in file and eco in root and is_new_rev_folder(root) and not \
+                                    is_material_spec(file) and not is_a_bom_redline(file):
+                                src_file = os.path.join(root, file)
+                                src_file_name, src_file_extension = os.path.splitext(src_file)
+                                if src_file_extension == ".pdf":
+                                    # right now I only want to get pdf files because that is the data we have
+                                    # TODO pull the hardcode .pdf extension out of here and make it selectable
+                                    new_file_name = create_new_part_name(line) + src_file_extension  # get a new name
+                                    new_dst_file_name = os.path.join(dstdir, new_file_name)
+                                    if not os.path.exists(new_dst_file_name):
+                                        shutil.copy(src_file, new_dst_file_name)
+                                        write_log(("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" %
+                                                   (num, rev, eco, src_file, new_file_name)), result_log)
+                                    else:
+                                        ii = 1
+                                        while True:
+                                            new_name = os.path.join(create_new_part_name(line) + "(" + str(ii) + ")" \
+                                                                    + src_file_extension)
+                                            new_name_path = os.path.join(dstdir, new_name)
+                                            if not os.path.exists(new_name_path):
+                                                shutil.copy(src_file, new_name_path)
+                                                write_log(("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" %
+                                                           (num, rev, eco, src_file, new_name)), result_log)
+                                                break
+                                            ii += 1
+                        print("=> elasped lpush: %s s" % t.secs)
             else:  # line length == 0
                 write_log("line: %s" % line, errorlog, "Zero length line")
