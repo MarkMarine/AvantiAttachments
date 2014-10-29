@@ -79,12 +79,27 @@ def is_item_attachment(num, file, eco, rev, root):
                 logging.debug("TRUE is not MS:\t%s\tSEARCH REV:\t%s" % (file, rev))
                 if not is_a_bom_redline(file):
                     logging.debug("TRUE is not BOM Redline:\t%s\tSEARCH REV:\t%s" % (file, rev))
-                    if return_rev_from_file_name(os.path.splitext(file)[0]) == filter_zeros_from_rev(rev):
-                        logging.debug("TRUE return_rev_from_file_name:\t%s\t== rev:%s\t%s" %
-                                      (file, rev, filter_zeros_from_rev(rev)))
-                        logging.debug("is_item_attachment:\tnum: %s\tfile: %s\teco: %s\trev: %s\troot: %s" %
-                                      (num, file, eco, rev, root))
-                        return True
+                    if not find_multiple_revs_in_file_name(os.path.splitext(file)[0]):
+                        logging.debug("TRUE no multiple revs in:\t%s" % file)
+                        if return_rev_from_file_name(os.path.splitext(file)[0]) == filter_zeros_from_rev(rev):
+                            logging.debug("TRUE return_rev_from_file_name:\t%s\t== rev:%s\t%s" %
+                                          (file, rev, filter_zeros_from_rev(rev)))
+                            logging.debug("is_item_attachment:\tnum: %s\tfile: %s\teco: %s\trev: %s\troot: %s" %
+                                          (num, file, eco, rev, root))
+                            return True
+                        elif is_new_rev_folder(root):
+                            logging.debug("TRUE is_new_rev_folder:\t%s\t%s" % (root, file))
+                            return True
+                        else:
+                            return False
+                    else:
+                        return False
+                else:
+                    return False
+            else:
+                return False
+        else:
+            return False
     else:
         return False
 
@@ -155,14 +170,7 @@ def search_and_copy_part_attachments(part_rev_eco_index, file_loc_index, copy_de
                                 perform_copy(num, rev, eco, root, file, line, copy_destination_dir)
                             else:
                                 test_run_for_copy(num, rev, eco, root, file, line, copy_destination_dir)
-
-                        elif num in file and eco in root and is_new_rev_folder(root) and not \
-                                is_material_spec(file) and not is_a_bom_redline(file):
-                            if not debug:
-                                perform_copy(num, rev, eco, root, file, line, copy_destination_dir)
-                            else:
-                                test_run_for_copy(num, rev, eco, root, file, line, copy_destination_dir)
-                        else:
-                            logging.info("Part Attachment not found for:\t%s" % line.rstrip('\n'))
+                    else:
+                        logging.info("Part Attachment not found for:\t%s" % line.rstrip('\n'))
             else:  # line length == 0
                 logging.info("Zero length line: (%s)" % line)

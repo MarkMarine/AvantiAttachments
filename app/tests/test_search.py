@@ -26,8 +26,8 @@ def test_find_rev_excludes_words_with_rev():
     assert search.return_rev_from_file_name("EMAIL- ECP 21098, Revision - Form F82419-Rev.pdf") is None
 
 
-def test_find_rev_fails_if_two_revs():
-    assert search.return_rev_from_file_name("0051-72664_001_REV_2 (99T0244 REV B CUSTOMER PRINT).pdf") is None
+def test_find__multiple_revs_returns_true_if_two_revs():
+    assert search.find_multiple_revs_in_file_name("0051-72664_001_REV_2 (99T0244 REV B CUSTOMER PRINT).pdf") is True
 
 
 def test_split_rev_table_returns_lst():
@@ -50,19 +50,19 @@ def test_is_a_bom_redline():
     file_false1 = 'ECO 10884BOM100016209-RevA-Chges.pdf'
     file_false2 = 'ECO 10884 BOMBPROOF 100016209-RevA-Chges.pdf'
     file_false3 = 'ECO 10884-BOMBPROOF-100016209-RevA-Chges.pdf'
-    assert search.is_a_bom_redline(file_true1) == True
-    assert search.is_a_bom_redline(file_true2) == True
-    assert search.is_a_bom_redline(file_true3) == True
-    assert search.is_a_bom_redline(file_false1) == False
-    assert search.is_a_bom_redline(file_false2) == False
-    assert search.is_a_bom_redline(file_false3) == False
+    assert search.is_a_bom_redline(file_true1) is True
+    assert search.is_a_bom_redline(file_true2) is True
+    assert search.is_a_bom_redline(file_true3) is True
+    assert search.is_a_bom_redline(file_false1) is True
+    assert search.is_a_bom_redline(file_false2) is True
+    assert search.is_a_bom_redline(file_false3) is True
 
 
 def test_is_material_spec():
-    assert search.is_material_spec("C:\\AVANTI\\ECP-ECO 2013\\19679\\NEW REVISIONS\\MS_100005039.pdf") == True
-    assert search.is_material_spec("MS_100005039.pdf") == True
-    assert search.is_material_spec("MS 100005039.pdf") == True
-    assert search.is_material_spec("msa_100005039.pdf") == False
-    assert search.is_material_spec(" msa_100005039.pdf") == False
-    assert search.is_material_spec("ms1_100005039.pdf") == False
-    assert search.is_material_spec("asdfms_100005039.pdf") == False
+    assert search.is_material_spec("C:\\AVANTI\\ECP-ECO 2013\\19679\\NEW REVISIONS\\MS_100005039.pdf") is True
+    assert search.is_material_spec("MS_100005039.pdf") is True
+    assert search.is_material_spec("MS 100005039.pdf") is True
+    assert search.is_material_spec("msa_100005039.pdf") is False
+    assert search.is_material_spec(" msa_100005039.pdf") is False
+    assert search.is_material_spec("ms1_100005039.pdf") is False
+    assert search.is_material_spec("asdfms_100005039.pdf") is False
