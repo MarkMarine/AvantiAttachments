@@ -1,1 +1,7 @@
 .idea/
+results/
+samples/
+indexes/
+app/__pycache__/
+app/tests/__pycache__/
+*.pyc
