@@ -1,8 +1,8 @@
 import os
 
 
-def create_path_index(locations, write_file):
-    for path in locations:
+def create_path_index(location_list, write_file):
+    for path in location_list:
         if os.path.exists(path):
             for root, dirs, files in os.walk(path):
                 if len(files) > 0:
