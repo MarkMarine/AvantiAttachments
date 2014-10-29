@@ -4,8 +4,6 @@ import os
 import shutil
 import logging
 
-from app.decorators import do_cprofile
-
 
 def filter_zeros_from_rev(rev):
     return re.sub("(0)+", "", rev)
@@ -73,7 +71,7 @@ def is_material_spec(file_name):
 def is_item_attachment(num, file, eco, rev, root):
     if num in file:
         logging.debug("TRUE NUM:\t%s\tIN FILE:\t%s\tSEARCH REV:\t%s" % (num, file, rev))
-        if eco in root:
+        if eco in root and eco != "1":
             logging.debug("TRUE ECO:\t%s\tIN ROOT:\t%s\tSEARCH REV:\t%s" % (eco, root, rev))
             if not is_material_spec(file):
                 logging.debug("TRUE is not MS:\t%s\tSEARCH REV:\t%s" % (file, rev))
@@ -87,7 +85,7 @@ def is_item_attachment(num, file, eco, rev, root):
                             logging.debug("is_item_attachment:\tnum: %s\tfile: %s\teco: %s\trev: %s\troot: %s" %
                                           (num, file, eco, rev, root))
                             return True
-                        elif is_new_rev_folder(root):
+                        elif is_new_rev_folder(root) and return_rev_from_file_name(file) is None:
                             logging.debug("TRUE is_new_rev_folder:\t%s\t%s" % (root, file))
                             return True
                         else:
@@ -138,6 +136,7 @@ def test_run_for_copy(num, rev, eco, root, file, line, copy_destination_dir):
         new_dst_file_name = os.path.join(copy_destination_dir, new_file_name)
         if not os.path.exists(new_dst_file_name):
             print("copy src:\t%s\tto:\t%s" % (src_file, new_dst_file_name))
+            logging.info("copy src:\t%s\tto:\t%s" % (src_file, new_dst_file_name))
             logging.debug("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" % (num, rev, eco, src_file, new_file_name))
         else:
             ii = 1
@@ -146,13 +145,14 @@ def test_run_for_copy(num, rev, eco, root, file, line, copy_destination_dir):
                 new_name_path = os.path.join(copy_destination_dir, new_name)
                 if not os.path.exists(new_name_path):
                     print("copy src:\t%s\tto:\t%s" % (src_file, new_name_path))
+                    logging.info("copy src:\t%s\tto:\t%s" % (src_file, new_name_path))
                     logging.debug("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" %
                                   (num, rev, eco, src_file, new_name))
                     break
                 ii += 1
 
 
-@do_cprofile
+# @do_cprofile
 def search_and_copy_part_attachments(part_rev_eco_index, file_loc_index, copy_destination_dir, debug=False):
     with open(part_rev_eco_index, "r+") as rev_index:  # open the part_rev_eco_index file assuming it's formatted
         for line in rev_index:  # look through each line

@@ -1,7 +1,4 @@
-import logging
 
-
-logging.basicConfig(filename='debug.log', level=logging.DEBUG)
 # region Description of Functions
 # Load both text files into memory
 
@@ -28,10 +25,34 @@ logging.basicConfig(filename='debug.log', level=logging.DEBUG)
 # errorlog = os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/manual_fix_required.txt")
 # endregion
 
-
 def main():
-    pass
+    # part_rev_eco_index = os.path.normpath(input("What is the location of the Part-REV-ECO index? "))
+    # # TODO remove this second input, this program should create this on it's own in normal use
+    # file_loc_index = os.path.normpath(input("What is the location of the file_location_index? "))
+    # copy_destination_dir = os.path.normpath(input("What is the location should the files be copied to? "))
+    debug_level = input("What should the debug level be: DEBUG, INFO, WARNING, ERROR? ")
+    part_rev_eco_index = os.path.normpath(
+        "c:/users/foxma/documents/github/avantiattachments/indexes/ItemNewRevW_O_sftwr.txt")
+    file_loc_index = os.path.normpath("c:/users/foxma/documents/github/avantiattachments/indexes/local_att_delim.txt")
+    copy_destination_dir = os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results")
+    debug = False
+    if debug_level == "DEBUG":
+        logging.basicConfig(filename='debug.log', level=logging.DEBUG)
+        debug = True
+    elif debug_level == "INFO":
+        logging.basicConfig(filename='info.log', level=logging.INFO)
+    elif debug_level == "WARNING":
+        logging.basicConfig(filename='warning.log', level=logging.WARNING)
+    elif debug_level == "ERROR":
+        logging.basicConfig(filename='error.log', level=logging.ERROR)
+    else:
+        logging.basicConfig(filename='error.log', level=logging.ERROR)
+
+    search.search_and_copy_part_attachments(part_rev_eco_index, file_loc_index, copy_destination_dir, debug)
 
 
 if __name__ == "__main__":
+    import logging
+    import os
+    import search
     main()

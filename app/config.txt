@@ -4,7 +4,6 @@ path_var = ["//mks-bld-105/ECP_ARCHIVE/ECP-ECO 2010", "//mks-bld-105/ECP_ARCHIVE
 
 result = search_and_copy_part_attachments(
     os.path.normpath("c:/users/foxma/documents/github/avantiattachments/indexes/ItemNewRevW_O_sftwr.txt"),
-    os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/error_log.txt"),
-    os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results"),
     os.path.normpath("c:/users/foxma/documents/github/avantiattachments/indexes/local_att_delim.txt"),
-    True)
+    os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results"),
+    "DEBUG")
