@@ -1,3 +1,1 @@
-__author__ = 'foxma'
-
-import os.path
+__all__ = ["app", "search", "decorators", "index"]
