@@ -112,7 +112,7 @@ def perform_copy(num, rev, eco, root, file, line, copy_destination_dir):
         new_dst_file_name = os.path.join(copy_destination_dir, new_file_name)
         if not os.path.exists(new_dst_file_name):
             shutil.copy(src_file, new_dst_file_name)
-            logging.info("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" % (num, rev, eco, src_file, new_file_name))
+            logging.info("%s\t%s\t%s\t%s" % (num, rev, eco, new_dst_file_name))
         else:
             ii = 1
             while True:
@@ -120,8 +120,7 @@ def perform_copy(num, rev, eco, root, file, line, copy_destination_dir):
                 new_name_path = os.path.join(copy_destination_dir, new_name)
                 if not os.path.exists(new_name_path):
                     shutil.copy(src_file, new_name_path)
-                    logging.info(("Target:\t%s-%s\ton ECO:\t%s\tfrom:\t%s\tto:\t%s" %
-                                  (num, rev, eco, src_file, new_name)))
+                    logging.info("%s\t%s\t%s\t%s" % (num, rev, eco, new_name_path))
                     break
                 ii += 1
 
@@ -154,6 +153,7 @@ def test_run_for_copy(num, rev, eco, root, file, line, copy_destination_dir):
 
 # @do_cprofile
 def search_and_copy_part_attachments(part_rev_eco_index, file_loc_index, copy_destination_dir, debug=False):
+
     with open(part_rev_eco_index, "r+") as rev_index:  # open the part_rev_eco_index file assuming it's formatted
         for line in rev_index:  # look through each line
             if len(line) > 0:
@@ -171,6 +171,6 @@ def search_and_copy_part_attachments(part_rev_eco_index, file_loc_index, copy_de
                             else:
                                 test_run_for_copy(num, rev, eco, root, file, line, copy_destination_dir)
                     else:
-                        logging.info("Part Attachment not found for:\t%s" % line.rstrip('\n'))
+                        logging.debug("Part Attachment not found for:\t%s" % line.rstrip('\n'))
             else:  # line length == 0
                 logging.info("Zero length line: (%s)" % line)
