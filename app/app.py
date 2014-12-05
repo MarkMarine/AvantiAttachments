@@ -25,16 +25,22 @@
 # errorlog = os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results/manual_fix_required.txt")
 # endregion
 
+
 def main():
     # part_rev_eco_index = os.path.normpath(input("What is the location of the Part-REV-ECO index? "))
     # # TODO remove this second input, this program should create this on it's own in normal use
     # file_loc_index = os.path.normpath(input("What is the location of the file_location_index? "))
     # copy_destination_dir = os.path.normpath(input("What is the location should the files be copied to? "))
+
+    #location_to_search_list = []
+    #location = input("What location should we walk through for attachments? ")
+    #location_to_search_list.append(os.path.normpath(location))
+    index.create_path_index("c:/avanti",
+                      os.path.normpath("C:/Users/FoxMa/Documents/GitHub/AvantiAttachments/results/location_list.txt"))
     debug_level = input("What should the debug level be: DEBUG, INFO, WARNING, ERROR? ")
-    part_rev_eco_index = os.path.normpath(
-        "c:/users/foxma/documents/github/avantiattachments/indexes/ItemNewRevW_O_sftwr.txt")
-    file_loc_index = os.path.normpath("c:/users/foxma/documents/github/avantiattachments/indexes/local_att_delim.txt")
-    copy_destination_dir = os.path.normpath("c:/users/foxma/documents/github/avantiattachments/results")
+    part_rev_eco_index = os.path.normpath("C:/Users/FoxMa/Documents/GitHub/AvantiAttachments/indexes/avantiattachmentload.txt")
+    file_loc_index = os.path.normpath("C:/Users/FoxMa/Documents/GitHub/AvantiAttachments/results/location_list.txt")
+    copy_destination_dir = os.path.normpath("C:/AVANTI_DEST/item_attachments")
     debug = False
     if debug_level == "DEBUG":
         logging.basicConfig(filename='debug.log', level=logging.DEBUG)
@@ -55,4 +61,5 @@ if __name__ == "__main__":
     import logging
     import os
     import search
+    import index
     main()
